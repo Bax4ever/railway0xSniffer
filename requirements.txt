@@ -2,6 +2,7 @@
 python-telegram-bot[asyncio]==21.0
 
 # Flask Webhook Handling
+flask[async]
 Flask==3.0.3
 Flask-Cors==5.0.0
 Werkzeug==3.0.4
