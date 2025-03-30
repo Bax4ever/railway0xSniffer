@@ -12,7 +12,7 @@ from bot.config import TRACKADEMYBOT
 app = Flask(__name__)
 
 # Create Telegram app
-application = ApplicationBuilder().token(TRACKADEMYBOT)
+application = ApplicationBuilder().token(Trackademybot).build()
 
 # Setup database and handlers
 init_db()
