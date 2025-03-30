@@ -15,6 +15,7 @@ from services.moralis_api import get_erc20_token_price_stats
 from db import get_recent_token_calls
 from services.moralis_api import get_multiple_token_prices_moralis_scoreboard  
 import time
+import telegram
 
   # Store this globally or in-memory module-wide
 
@@ -399,12 +400,24 @@ async def handle_portfolio_add_wallet(update: Update, context: ContextTypes.DEFA
     msg=await update.effective_message.reply_text(" Please enter wallet address:")
     asyncio.create_task(delete_later(context.bot, update.effective_chat.id, msg.message_id, delay=4))
     
-async def delete_later(bot, chat_id, message_id, delay=4):
-    await asyncio.sleep(delay)
+async def delete_later(bot, chat_id, message_id, delay=6):
     try:
-        await bot.delete_message(chat_id=chat_id, message_id=message_id)
-    except BadRequest as e:
-        if "message to delete not found" not in str(e).lower():
+        await asyncio.sleep(delay)
+        try:
+            await bot.delete_message(chat_id=chat_id, message_id=message_id)
+            print(f"[🗑️] Deleted message {message_id} in chat {chat_id}")
+        except telegram.error.BadRequest as e:
+            if "message to delete not found" in str(e).lower():
+                print(f"[⚠️] Message {message_id} already deleted or missing.")
+            else:
+                print(f"[❌] Telegram BadRequest: {e}")
+        except Exception as e:
+            print(f"[❌] Unexpected error during delete_later: {e}")
+
+    except RuntimeError as e:
+        if "event loop is closed" in str(e).lower():
+            print("[⚠️] Skipped delete_later: event loop was closed.")
+        else:
             raise
 
 async def handle_view_portfolio_wallet(update: Update, context: ContextTypes.DEFAULT_TYPE):
